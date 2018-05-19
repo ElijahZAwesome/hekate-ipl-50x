@@ -26,6 +26,8 @@
 #define MENT_CHOICE 3
 #define MENT_BACK 4
 
+extern int instantboot;
+
 typedef struct _ment_t
 {
 	u32 type;

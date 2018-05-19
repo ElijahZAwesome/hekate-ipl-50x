@@ -20,6 +20,7 @@ OBJS = $(addprefix $(BUILD)/, \
 	heap.o \
 	hos.o \
 	i2c.o \
+	image.o \
 	kfuse.o \
 	lz.o \
 	max7762x.o \

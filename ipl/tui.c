@@ -40,7 +40,8 @@ void tui_pbar(gfx_con_t *con, int x, int y, u32 val)
 
 void *tui_do_menu(gfx_con_t *con, menu_t *menu)
 {
-	int idx = 0, cnt;
+    int idx = 0;
+    int cnt;
 
 	gfx_clear(con->gfx_ctxt, 0xFF000000);
 

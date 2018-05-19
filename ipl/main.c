@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <alloca.h>
 
+#include "image.h"
 #include "clock.h"
 #include "uart.h"
 #include "i2c.h"
@@ -46,6 +47,8 @@
 #include "se_t210.h"
 #include "hos.h"
 #include "pkg1.h"
+
+extern int instantboot;
 
 void panic(u32 val)
 {
@@ -619,7 +622,7 @@ void launch_firmware()
 				menu_t menu = {
 					ments, "Launch configurations", 0, 0
 				};
-				cfg_sec = (ini_sec_t *)tui_do_menu(&gfx_con, &menu);
+                cfg_sec = (ini_sec_t *)tui_do_menu(&gfx_con, &menu);
 				if (!cfg_sec)
 					return;
 			}
@@ -644,6 +647,58 @@ void launch_firmware()
 out:;
 	sleep(200000);
 	btn_wait();
+}
+
+void instaboot()
+{
+    ini_sec_t *cfg_sec = NULL;
+    LIST_INIT(ini_sections);
+    
+    if (sd_mount()) //kip1 = sm.kip1 or loader.kip1
+    {
+        if (ini_parse(&ini_sections, "hekate_ipl.ini"))
+        {
+            //Build configuration menu.
+            ment_t *ments = (ment_t *)malloc(sizeof(ment_t) * 16);
+            ments[0].type = MENT_BACK;
+            ments[0].caption = "Back";
+            u32 i = 1;
+            LIST_FOREACH_ENTRY(ini_sec_t, ini_sec, &ini_sections, link)
+            {
+                if (!strcmp(ini_sec->name, "config"))
+                    continue;
+                ments[i].type = MENT_CHOICE;
+                ments[i].caption = ini_sec->name;
+                ments[i].data = ini_sec;
+                i++;
+            }
+            if (i > 1)
+            {
+                memset(&ments[i], 0, sizeof(ment_t));
+                menu_t menu = {
+                    ments, "Launch configurations", 0, 0
+                };
+                menu_t *tent = &menu;
+                ment_t *ent = &tent->ents[2];
+                cfg_sec = ent->data;
+                if (!cfg_sec)
+                    return;
+            }
+            else
+                gfx_printf(&gfx_con, "%kNo launch configurations found.%k\n", 0xFF0000FF, 0xFFFFFFFF);
+            free(ments);
+        }
+        else
+            gfx_printf(&gfx_con, "%kFailed to load 'hekate_ipl.ini'.%k\n", 0xFF0000FF, 0xFFFFFFFF);
+    }
+    else
+        gfx_printf(&gfx_con, "%kFailed to mount SD card (make sure that it is inserted).%k\n", 0xFF0000FF, 0xFFFFFFFF);
+    
+    if (!cfg_sec)
+        gfx_printf(&gfx_con, "Using default launch configuration.\n");
+    
+    if (!hos_launch(cfg_sec))
+        gfx_printf(&gfx_con, "%kFailed to launch firmware.%k\n", 0xFF0000FF, 0xFFFFFFFF);
 }
 
 void about()
@@ -713,16 +768,29 @@ ment_t ment_top[] = {
 	MDEF_HANDLER("Launch firmware", launch_firmware),
 	MDEF_MENU("Tools", &menu_tools),
 	MDEF_MENU("Console info", &menu_cinfo),
-	MDEF_HANDLER("Reboot (normal)", reboot_normal),
-	MDEF_HANDLER("Reboot (rcm)", reboot_rcm),
+	MDEF_HANDLER("Reboot Normally", reboot_normal),
+	MDEF_HANDLER("Reboot in RCM Mode", reboot_rcm),
 	MDEF_HANDLER("Power off", power_off),
 	MDEF_HANDLER("About", about),
 	MDEF_END()
 };
 menu_t menu_top = {
 	ment_top,
-	"hekate - ipl", 0, 0
+	"Hekate IPL - Instant Boot Edition", 0, 0
 };
+
+void splash() {
+    gfx_clear(&gfx_ctxt, 0xFF000000);
+    gfx_con_setpos(&gfx_con, 0, 0);
+    
+    if (sd_mount()) {
+        draw_image(&gfx_con, "image.txt");
+    }
+    else {
+        gfx_con_setcol(&gfx_con, 0xFF000000, 1, 0xFFFFFFFF);
+        gfx_printf(&gfx_con, "%kFailed to mount SD card (make sure that it is inserted).%k\n");
+    }
+}
 
 extern void pivot_stack(u32 stack_top);
 
@@ -745,6 +813,11 @@ void ipl_main()
 	gfx_init_ctxt(&gfx_ctxt, fb, 720, 1280, 768);
 	gfx_clear(&gfx_ctxt, 0xFF000000);
 	gfx_con_init(&gfx_con, &gfx_ctxt);
+    if (btn_read() != BTN_VOL_DOWN) {
+        splash();
+        sleep(5000000);
+        instaboot();
+    }
 
 	while (1)
 		tui_do_menu(&gfx_con, &menu_top);
