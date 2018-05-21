@@ -815,7 +815,7 @@ void ipl_main()
 	gfx_con_init(&gfx_con, &gfx_ctxt);
     if (btn_read() != BTN_VOL_DOWN) {
         splash();
-        sleep(5000000);
+        sleep(100000);
         instaboot();
     }
 
