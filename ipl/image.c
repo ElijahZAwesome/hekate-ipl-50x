@@ -28,7 +28,8 @@ int draw_image(gfx_con_t *con, char *ini_path) {
     FIL fp;
     if (f_open(&fp, ini_path, FA_READ) != FR_OK) {
         gfx_con_setpos(con, 0, 0);
-        gfx_printf(con, "File not found. Please make sure image.txt is located on the SD card.");
+        gfx_printf(con, "No splash as found, make sure splash.txt is present on the SD Card. booting anyway...");
+        sleep(1000000);
         return 0;
     }
     f_gets(lbuf, 9, &fp);

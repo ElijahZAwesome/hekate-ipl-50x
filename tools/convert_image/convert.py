@@ -34,6 +34,6 @@ for y in range(img.size[0]):
     pixels.append(pixelMap[y,x][2])
   for x in range(0, 48 * 4):
     pixels.append(0)
-with open('image.txt','wb') as f:
+with open('splash.txt','wb') as f:
   f.write(bytes(str(720 * 1280).rjust(8, "0"), 'utf-8'))
   f.write(bytes(x for x in pixels))

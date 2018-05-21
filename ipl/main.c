@@ -784,7 +784,7 @@ void splash() {
     gfx_con_setpos(&gfx_con, 0, 0);
     
     if (sd_mount()) {
-        draw_image(&gfx_con, "image.txt");
+        draw_image(&gfx_con, "splash.txt");
     }
     else {
         gfx_con_setcol(&gfx_con, 0xFF000000, 1, 0xFFFFFFFF);
