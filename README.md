@@ -1,20 +1,10 @@
-# hekate for 5.0.x
+# instant boot hekate for 5.0.x
 
 DO NOT UPDATE TO 5.0.2 FOR THIS
 
 Original by @nwert
 
-![Image of Hekate](https://upload.wikimedia.org/wikipedia/commons/f/fc/H%C3%A9cate_-_Mallarm%C3%A9.png)
 
-Nintendo Switch bootloader, firmware patcher, and more.
+Instantly boots into CFW using hekate, unless minus/select is held while booting.
 
-## ipl config
-
-The ipl can be configured via 'hekate_ipl.ini' (if it is present on the SD card). Each ini section represents a boot entry, except for the special section 'config' that controls the global configuration.
-
-Possible key/value combinations:
-
- - warmboot={SD path}
- - secmon={SD path}
- - kernel={SD path}
- - kip1={SD path}
+A splash screen appears briefly before boot, this splash screen can be customized using tools/convert_image and putting image.txt on your SD card.
