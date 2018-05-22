@@ -1,4 +1,6 @@
 .vs
 .vscode
-*/build_ipl/*
-*.DS_Store
+build_ipl/*
+.DS_Store
+4.x/build_ipl/*
+f.x/.DS_Store
