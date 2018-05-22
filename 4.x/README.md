@@ -1,9 +1,4 @@
-# instant boot hekate for 5.0.x
-
-DO NOT UPDATE TO 5.0.2 FOR THIS
-
-Original by @nwert
-
+# instant boot hekate for 4.0.x
 
 Instantly boots into CFW using hekate, unless minus/select is held while booting.
 
